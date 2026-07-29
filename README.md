@@ -91,10 +91,6 @@ Every row below points to the exact notebook and cell range responsible for a sp
 
 | Paper element | Dataset | Notebook | Cells |
 |---|---|---|---|
-| Table I — architecture selection ablation (ResNet-18 / Inception / Xception / PaDiM / PatchCore) | VisA | `VisA_NB0_Research.ipynb` | Cell 13 (Feature Extractor) → Cell 14 (PatchCore Config) → Cell 19 (Global Execution Loop & Ablation Study) → Cell 20 (Ablation Metrics Parsing) |
-| Table I — architecture selection ablation | DAGM | `DAGM_NB0_Research.ipynb` | Cell 10 (PatchCore Config & Crop Extraction) → Cell 11 (Feature Extractor & Eval Loop) → Cell 14/14.1 (Metric Engine & Ablation Sweep) |
-| Table II — Stage 1 rows (PCA dim, Gaussian σ ablation) | VisA | `VisA_NB0_Research.ipynb` | Cell 17.1 (Automated Ablation Grid Generator) → Cell 19 → Cell 20 |
-| Table II — Stage 1 rows (PCA dim, Gaussian σ ablation) | DAGM | `DAGM_NB0_Research.ipynb` | Cell 13.1 (Automated Ablation Grid Generator) → Cell 14/14.1 |
 | Table III — Stage 1 metrics (Image/Pixel AUROC, Pixel AP, Pixel AUPRO, train/inference time, peak VRAM) | VisA | `VisA_NB0_Research.ipynb` | Cell 19 → Cell 21 (Visualizing Ablation Tradeoffs) |
 | Table III — Stage 1 metrics | DAGM | `DAGM_NB0_Research.ipynb` | Cell 14.2 (Ablation Logging & Global Summary) → Cell 16 (Handoff Verification) |
 | Fig. 2 — PatchCore baseline learning phase | — | `VisA_NB0_Research.ipynb` or `DAGM_NB0_Research.ipynb` | Cells 13–17 (feature extraction → coreset subsampling → memory bank export) |
@@ -105,8 +101,6 @@ Every row below points to the exact notebook and cell range responsible for a sp
 
 | Paper element | Dataset | Notebook | Cells |
 |---|---|---|---|
-| Table II — Stage 2 rows (ROI coverage %, crop strategy, localization accuracy) | VisA | `VisA_NB1_Research.ipynb` | Cell 7 (Crop Extraction Function) → Cell 9.1 (Automated NB1 Ablation Grid Generator) → Cell 10 (Inference & Crop Extraction Loop) |
-| Table II — Stage 2 rows | DAGM | `DAGM_NB1_Research.ipynb` | Cell 9 (Hybrid Threshold + Masking) → Cell 9.1 (Automated Ablation Grid Generator) → Cell 10 (Tight & Context Crop Extraction) |
 | Table III — Stage 2 metrics (IoU, F1, False Positive Rate, processing overhead ms, peak VRAM) | VisA | `VisA_NB1_Research.ipynb` | Cell 16 (Global Metrics & Crop Overlap Aggregation) → Cell 17 (Final Packaging, Manifest Check & Unified Logging) |
 | Table III — Stage 2 metrics | DAGM | `DAGM_NB1_Research.ipynb` | Cell 16 (Global Metrics & Ablation Results Table) → Cell 16.1 (Class-Wise Ablation Metrics) |
 | Fig. 3/4 — tight crop / context crop visualization | VisA | `VisA_NB1_Research.ipynb` | Cell 11 (Visualizing the Anomaly Detection Pipeline) → Cell 12 (Final Output Verification, 6-Column Context View) |
@@ -116,8 +110,6 @@ Every row below points to the exact notebook and cell range responsible for a sp
 
 | Paper element | Dataset | Notebook | Cells |
 |---|---|---|---|
-| Table II — Stage 3 rows (TTA mode, entropy gate, crop fusion, final accuracy) | VisA | `VisA_NB2_Research.ipynb` | Cell 9 (Temperature Calibration, Entropy Threshold, Mahalanobis Fit) → Cell 10 (Deep Enhancement / TTA / Orthogonal Subspace Projection) → Cell 11 (Static Feature Fusion, Mahalanobis Gate) |
-| Table II — Stage 3 rows | DAGM | `DAGM_NB2_Research.ipynb` | Cell 9 → Cell 10 → Cell 11 |
 | Table III — Stage 3 metrics (Standard CLIP / AnomalyCLIP / Final Routed accuracy, win rates, end-to-end latency) | VisA | `VisA_NB2_Research.ipynb` | Cell 19 (Accuracy by Class) → Cell 23 (Quantitative Performance & Routing Verification Tables) |
 | Table III — Stage 3 metrics | DAGM | `DAGM_NB2_Research.ipynb` | Cell 19 → Cell 23 (Quantitative Performance & Routing Verification Tables) |
 | Fig. 4 — full end-to-end pipeline flow (one image per class) | VisA | `VisA_NB2_Research.ipynb` | Cell 17 (Paper Figure — Full Pipeline Flow) |
@@ -138,7 +130,7 @@ These are the values used to produce every reported number in the paper. Where a
 | Gaussian smoothing kernel | σ = 0.1 | Reflect-padded, applied to the anomaly map before max-pooling |
 | FAISS nearest-neighbor search | k = 9 | Exact search, `IndexFlatL2`, embeddings L2-normalized before indexing |
 | Anomaly threshold (τ) | 99th percentile of nominal validation scores | Per-dataset, computed independently |
-| ROI expansion (Context Crop) | **DAGM: 50%** · **VisA: 75%** | Per Table II ablation; ⚠️ see note below |
+| ROI expansion (Context Crop) | **DAGM & VisA: 50%** | |
 | Crop fusion weights | 0.7 · tight-crop vector + 0.3 · context-crop vector | Static linear fusion |
 | Input resolution (Stage 1) | 512 × 512 | Standardized across both datasets |
 | VisA-specific preprocessing | Automated background removal + Gaussian blur (kernel size 3) | Applied only to VisA to suppress high-frequency background noise |
