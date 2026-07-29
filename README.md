@@ -34,27 +34,42 @@ Notebooks must be run in order (`NB0 → NB1 → NB2`) per dataset, since each s
 
 ## 2. Environment Setup
 
-**Framework:** PyTorch 2.1.0+cu121
+**Framework:** PyTorch 2.10.0+cu128, Torchvision 0.25.0+cu128 (confirmed via the environment-check cell run at the top of all six notebooks)
 
-**Hardware used for reported results:** Single NVIDIA Tesla T4 GPU (~15 GB VRAM), Kaggle cloud environment.
+**Hardware used for reported results:** Single NVIDIA Tesla T4 GPU (~15.64 GB VRAM, decimal-GB basis; the same card reports ~14.56 GiB when measured via `total_memory / 1024**3` in a different notebook — same physical hardware, two unit conventions, not a discrepancy), Kaggle cloud environment, 4 CPU cores.
 
-**Key dependencies:**
+**Key dependencies (as actually installed/imported across the six notebooks):**
 ```
-torch==2.1.0+cu121
-anomalib
-faiss-gpu          # or faiss-cpu if no GPU indexing available
-open_clip_torch    # Standard CLIP (ViT-B/32) and AnomalyCLIP (ViT-L/14)
-numpy
-scipy              # Mahalanobis distance, Spearman correlation
+torch==2.10.0+cu128
+torchvision==0.25.0+cu128
+pytorch-lightning==2.0.0
+anomalib==1.0.1
+timm
+scikit-learn
+opencv-python
+faiss-cpu
+open_clip_torch                          # Standard CLIP (ViT-B/32)
+git+https://github.com/openai/CLIP.git   # OpenAI CLIP (NB2, Cell 0)
+AnomalyCLIP                               # cloned from github.com/zqhang/AnomalyCLIP (ViT-L/14)
+rembg[gpu]                                 # background removal — VisA preprocessing only (NB0, Cell 8)
+ftfy
+regex
+tqdm
+Pillow
 pandas
-pyarrow            # Parquet serialization (NB2, Cell 13)
+matplotlib
+seaborn
+psutil                                     # memory-feasibility check (VisA NB0, Cell 5)
+scipy                                       # Mahalanobis distance, Spearman correlation
+pyarrow                                     # Parquet serialization (NB2, Cell 13)
+thop
 ```
 
 **Determinism / seeds:**
 - All experiments use a single fixed seed: `seed = 42`
-- Seed is frozen across **PyTorch, NumPy, CUDA, and cuDNN** before any data loading occurs
-- Strict cuDNN backend determinism is enforced via the `CUBLAS_WORKSPACE_CONFIG` environment variable
-- Set this before importing torch, e.g.:
+- Seed is frozen across **PyTorch, NumPy, CUDA, and cuDNN** before any data loading occurs (`torch.manual_seed`, `np.random.seed`, `torch.cuda.manual_seed_all`, `torch.backends.cudnn.deterministic = True`, `torch.backends.cudnn.benchmark = False`)
+- Strict cuDNN backend determinism is additionally enforced via the `CUBLAS_WORKSPACE_CONFIG` environment variable and `torch.use_deterministic_algorithms(True, warn_only=True)`, both set **before** any CUDA initialization
+- Set the environment variable before importing torch, e.g.:
   ```bash
   export CUBLAS_WORKSPACE_CONFIG=:4096:8
   ```
@@ -63,8 +78,8 @@ pyarrow            # Parquet serialization (NB2, Cell 13)
 **Dataset splits used:**
 | Dataset | Split | Notes |
 |---|---|---|
-| DAGM | 80/20 train/validation | Frozen split; test set fixed per the DAGM standard benchmark definition |
-| VisA | 60/20/20 train/validation/test | Deterministic split applied strictly over the normal-image distribution; all anomalous images are routed to the test set; `train_set ∩ val_set = ∅` is asserted at loader initialization |
+| DAGM | 80/20 train/validation | Frozen split (`GLOBAL_TRAIN_SPLIT = 0.8`, `GLOBAL_VAL_SPLIT = 0.2`); test set fixed per the DAGM standard benchmark definition |
+| VisA | 60/20/20 train/validation/test | Deterministic split (`train_test_split`, `random_state=42`) applied strictly over the normal-image distribution; all anomalous images are routed to the test set; zero-overlap is explicitly asserted for all three split pairs (`train ∩ val`, `train ∩ test`, `val ∩ test`) at loader initialization |
 
 ---
 
@@ -135,8 +150,6 @@ These are the values used to produce every reported number in the paper. Where a
 | Entropy confusion threshold | 99th percentile of Shannon entropy H(P) | Above this, Test-Time Augmentation (TTA) is triggered |
 | TTA augmented views | 4 | Embeddings averaged into V_TTA |
 | Random seed | 42 | Frozen across PyTorch, NumPy, CUDA, cuDNN |
-
-> ⚠️ **Note on ROI expansion:** the ablation results (Table II) show the deployed configuration uses a **50% context margin for DAGM and 75% for VisA** — a per-dataset value, not the single α = 0.5 stated in the Methodology section text. If the manuscript text still says a uniform α = 0.5, reconcile it against Table II before final submission.
 
 ---
 
